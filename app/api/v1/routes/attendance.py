@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.crud.attendance import mark_attendance, get_attendance
 from app.schemas.attendance import AttendanceOut
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -14,9 +15,15 @@ def get_db():
         db.close()
 
 @router.post("/mark", response_model=AttendanceOut)
-def mark(user_id: int, db: Session = Depends(get_db)):
-    return mark_attendance(db, user_id)
+def mark(
+    db: Session = Depends(get_db),
+    current_user: int = Depends(get_current_user)
+):
+    return mark_attendance(db, current_user)
 
 @router.get("/history", response_model=list[AttendanceOut])
-def history(user_id: int, db: Session = Depends(get_db)):
-    return get_attendance(db, user_id)
+def history(
+    db: Session = Depends(get_db),
+    current_user: int = Depends(get_current_user)
+):
+    return get_attendance(db, current_user)
