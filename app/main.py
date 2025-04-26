@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from app.core.database import Base, engine
-from app.api.v1.routes import user, attendance, auth
+# from app.models.leave_request import LeaveRequest  # 👈 ADD THIS LINE
+from app.api.v1.routes import user, attendance, auth, leave_request
 
 app = FastAPI()
 
@@ -10,7 +11,7 @@ Base.metadata.create_all(bind=engine)
 app.include_router(user.router, prefix="/api/v1/user", tags=["User"])
 app.include_router(attendance.router, prefix="/api/v1/attendance", tags=["Attendance"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Auth"])
-
+app.include_router(leave_request.router, prefix="/api/v1/leave", tags=["Leave"])
 # Add JWT Bearer Auth globally
 def custom_openapi():
     if app.openapi_schema:
@@ -28,7 +29,6 @@ def custom_openapi():
             "bearerFormat": "JWT"
         }
     }
-    # Apply BearerAuth globally to every path (except /auth/login and /auth/logout)
     for path, path_item in openapi_schema["paths"].items():
         for method in path_item:
             if not path.startswith("/api/v1/auth/login") and not path.startswith("/api/v1/auth/logout"):
