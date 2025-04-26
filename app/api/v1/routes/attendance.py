@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
-from app.crud.attendance import mark_attendance, get_attendance
+from app.crud.attendance import get_today_attendance, mark_attendance, get_attendance
 from app.schemas.attendance import AttendanceOut
 from app.utils.auth import get_current_user
 
@@ -27,3 +27,7 @@ def history(
     current_user: int = Depends(get_current_user)
 ):
     return get_attendance(db, current_user)
+
+@router.get("/today", response_model=list[AttendanceOut])
+def today_attendance(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    return get_today_attendance(db, current_user)
